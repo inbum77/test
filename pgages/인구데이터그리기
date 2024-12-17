@@ -1,0 +1,40 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 데이터 로드
+@st.cache_data
+def load_data():
+    df = pd.read_csv("age2411.csv")
+    return df
+
+df = load_data()
+
+# 사용자 인터페이스
+st.title("🏘️ 우리 동네 인구 구조를 알아보자!")
+st.write("원하는 지역을 선택하면 해당 지역의 인구 구조를 시각화해드립니다.📊")
+
+# 지역 선택
+regions = df['행정구역'].unique()
+selected_region = st.selectbox("🔍 지역을 선택하세요:", regions)
+
+# 선택한 지역 필터링
+selected_data = df[df['행정구역'] == selected_region]
+
+# 연령대별 인구 추출
+age_columns = [col for col in df.columns if '계_' in col and '총인구수' not in col and '연령구간인구수' not in col]
+age_data = selected_data[age_columns].iloc[0].values
+
+# 연령대 이름 정리
+ages = [col.split('_')[2] for col in age_columns]
+
+# 그래프 그리기
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(ages, age_data)
+plt.xticks(rotation=90)
+plt.title(f"{selected_region}의 연령대별 인구 구조")
+plt.xlabel("연령대")
+plt.ylabel("인구수")
+st.pyplot(fig)
+
+st.write("📌 이 그래프를 통해 연령대별 인구가 어떻게 분포되어 있는지 확인해보세요!")
