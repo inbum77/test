@@ -1,6 +1,5 @@
 streamlit
-pdf2image
+pymupdf==1.23.3  # 최신 버전을 명시적으로 설치
 python-pptx
 pillow
-poppler-utils
 koreanize-matplotlib
