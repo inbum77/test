@@ -3,3 +3,4 @@ pdf2image
 python-pptx
 pillow
 poppler-utils
+koreanize-matplotlib
