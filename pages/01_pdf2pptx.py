@@ -50,7 +50,8 @@ if uploaded_pdf:
 
     try:
         # PDF를 이미지로 변환
-        images = pdf_to_images(uploaded_pdf.read())
+        pdf_bytes = uploaded_pdf.read()
+        images = pdf_to_images(pdf_bytes)
         st.success(f"{len(images)} 페이지의 PDF가 성공적으로 변환되었습니다! 🖼️")
 
         # 이미지들을 PPTX로 변환
