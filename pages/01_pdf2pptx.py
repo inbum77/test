@@ -1,12 +1,19 @@
 import streamlit as st
-from pdf2image import convert_from_bytes
+import fitz  # PyMuPDF
 from pptx import Presentation
-from pptx.util import Inches, Mm
+from pptx.util import Inches
 import io
+from PIL import Image
 
 # PDF를 이미지로 변환하는 함수
 def pdf_to_images(pdf_bytes):
-    images = convert_from_bytes(pdf_bytes)
+    pdf_document = fitz.open(stream=pdf_bytes, filetype="pdf")
+    images = []
+    for page_num in range(len(pdf_document)):
+        page = pdf_document.load_page(page_num)
+        pix = page.get_pixmap()
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        images.append(img)
     return images
 
 # 이미지 리스트를 PPTX로 변환하는 함수
@@ -35,29 +42,4 @@ def images_to_pptx(images):
 st.title("📄 PDF를 PPTX로 변환하기")
 st.write("PDF 파일을 업로드하면 각 페이지를 이미지로 변환하여 PPTX 파일로 만들어줍니다. 😊")
 
-uploaded_pdf = st.file_uploader("PDF 파일을 선택하세요:", type=["pdf"])
-
-if uploaded_pdf:
-    st.info("PDF 파일을 처리 중입니다... 잠시만 기다려주세요! ⏳")
-
-    # PDF를 이미지로 변환
-    images = pdf_to_images(uploaded_pdf.read())
-    st.success(f"{len(images)} 페이지의 PDF가 성공적으로 변환되었습니다! 🖼️")
-
-    # 이미지들을 PPTX로 변환
-    pptx_presentation = images_to_pptx(images)
-
-    # PPTX 파일을 메모리에서 저장
-    pptx_bytes = io.BytesIO()
-    pptx_presentation.save(pptx_bytes)
-    pptx_bytes.seek(0)
-
-    # 다운로드 버튼
-    st.download_button(
-        label="📥 PPTX 다운로드",
-        data=pptx_bytes,
-        file_name="converted_presentation.pptx",
-        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    )
-
-    st.success("PPTX 파일이 준비되었습니다! 다운로드 버튼을 클릭하세요. ✅")
+upload
